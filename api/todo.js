@@ -37,7 +37,7 @@ const toggleTodoStatus = async ({ docId, status }) => {
 const deleteTodo = async (docId) => {
   try {
     const todoRef = doc(db, "todo", docId);
-    await deleteDoc(todoRef);
+    await deleteDoc(todoRef); 
   } catch (err) {
     console.log(err);
   }

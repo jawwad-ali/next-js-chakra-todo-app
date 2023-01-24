@@ -51,8 +51,8 @@ const TodoList = () => {
   });
 
   useEffect(() => {
-    refreshData();
-  }, []);
+    refreshData(); 
+  });
 
   //   Function for del todo
   const handleDeleteTodo = async (id: number) => {
@@ -85,6 +85,7 @@ const TodoList = () => {
           todos.map((todo: Todo) => (
             <Box
               p="3"
+              key={todo.id}
               boxShadow={"2xl"}
               // shadow="dark-lg"
               transition={"0.2s"}
