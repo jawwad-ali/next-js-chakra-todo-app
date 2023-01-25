@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import {
   collection,
-  getDocs,
   onSnapshot,
   query,
   where,
@@ -31,28 +30,29 @@ const TodoList = () => {
   const { user } = useAuth();
   const toast = useToast();
 
+  // Update data when user adds another data
   const refreshData = () => {
     if (!user) {
       setTodos([]);
+      return;
     }
+    //   Query to display todos to associated user
+    const q = query(collection(db, "todo"), where("user", "==", user?.uid));
+    onSnapshot(q, (querySnapShot) => {
+      let ar: any = [];
+      querySnapShot.docs.forEach((doc) => {
+        ar.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+      setTodos(ar);
+    });
   };
 
-  //   Query to display todos to associated user
-  const q = query(collection(db, "todo"), where("user", "==", user?.uid));
-  onSnapshot(q, (querySnapShot) => {
-    let ar:any = [];
-    querySnapShot.docs.forEach((doc) => {
-      ar.push({
-        id: doc.id,
-        ...doc.data(),
-      });
-    });
-    setTodos(ar);
-  });
-
   useEffect(() => {
-    refreshData(); 
-  });
+    refreshData();
+  }, [user]);
 
   //   Function for del todo
   const handleDeleteTodo = async (id: number) => {
@@ -65,6 +65,7 @@ const TodoList = () => {
     }
   };
 
+  // Function to toggle todo state from pending to complete and vice-versa 
   const handleToggle = async (id: number, status: string) => {
     const newStatus = status === "completed" ? "pending" : "completed";
     await toggleTodoStatus({
@@ -79,8 +80,8 @@ const TodoList = () => {
   };
 
   return (
-    <Box mt="5">
-      <SimpleGrid columns={{ base: 1, md: 2 , lg:3 }} spacing={8}>
+    <Box mt="10">
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
         {todos &&
           todos.map((todo: Todo) => (
             <Box
